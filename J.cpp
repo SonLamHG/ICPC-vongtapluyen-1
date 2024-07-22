@@ -1,67 +1,42 @@
 #include<bits/stdc++.h>
-#define ll long long
-#define endl '\n'
+#define int long long
+
 using namespace std;
 
-const int MAXN = 200005;
-int arr[MAXN];
-int leftLimit[MAXN], rightLimit[MAXN];
-int result[MAXN];
+main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);cout.tie(nullptr);
 
-int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(0);
+    int n; cin>>n;
+    int a[n];
+    for(int i=0; i<n; i++) cin>>a[i];
 
-    int n; 
-    cin >> n;
-
-    for (int i = 1; i <= n; i++) {
-        cin >> arr[i];
-    }
-
+    int l[n],r[n];
     stack<int> st;
 
-    // Find the next smaller element to the left
-    for (int i = 1; i <= n; i++) {
-        while (!st.empty() && arr[st.top()] >= arr[i]) {
-            st.pop();
-        }
-        leftLimit[i] = st.empty() ? 0 : st.top();
+    for(int i=0; i<n; i++){
+        while(st.size() && a[i]<=a[st.top()]) st.pop();
+        l[i]=-1;
+        if(st.size()) l[i]=st.top();
         st.push(i);
     }
 
-    while (!st.empty()) st.pop();
-
-    // Find the next smaller element to the right
-    for (int i = n; i >= 1; i--) {
-        while (!st.empty() && arr[st.top()] >= arr[i]) {
-            st.pop();
-        }
-        rightLimit[i] = st.empty() ? n + 1 : st.top();
+    while(st.size()) st.pop();
+    for(int i=n-1; i>=0; i--){
+        while(st.size() && a[i]<=a[st.top()]) st.pop();
+        r[i]=n;
+        if(st.size()) r[i]=st.top();
         st.push(i);
     }
 
-    // Initialize result array
-    for (int i = 1; i <= n; i++) {
-        result[i] = 0;
+    vector<int> ans(n+1,0);
+    for(int i=0; i<n; i++){
+        int d=r[i]-l[i]-1;
+        ans[d]=max(ans[d],a[i]);
     }
+    for(int i=n-1; i>0; i--) ans[i]=max(ans[i],ans[i+1]);
 
-    // Fill result array with the maximum of minimums for every length
-    for (int i = 1; i <= n; i++) {
-        int length = rightLimit[i] - leftLimit[i] - 1;
-        result[length] = max(result[length], arr[i]);
-    }
-
-    // Fill the empty entries by taking the maximum from the right
-    for (int i = n - 1; i >= 1; i--) {
-        result[i] = max(result[i], result[i + 1]);
-    }
-
-    // Output the result
-    for (int i = 1; i <= n; i++) {
-        cout << result[i] << " ";
-    }
-    cout << endl;
+    for(int i=1; i<=n; i++) cout<<ans[i]<<' ';
 
     return 0;
 }
